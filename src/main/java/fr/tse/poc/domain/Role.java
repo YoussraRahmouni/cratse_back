@@ -1,20 +1,19 @@
 package fr.tse.poc.domain;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 public class Role {
 
     @Id
-    @GeneratedValue
-    private int idRole;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idRole;
 
     private String labelRole;
 
