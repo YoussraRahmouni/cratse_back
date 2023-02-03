@@ -1,5 +1,7 @@
 package fr.tse.poc.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,6 +19,7 @@ public class Role {
 
     private String labelRole;
 
-    @OneToMany(mappedBy = "role")
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    @JsonBackReference
     private Set<User> users;
 }

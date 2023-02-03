@@ -25,13 +25,11 @@ public class Imputation {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "idProject", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "idUser", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
     private User user;
 
 }

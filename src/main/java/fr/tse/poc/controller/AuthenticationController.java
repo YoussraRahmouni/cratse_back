@@ -4,8 +4,10 @@ import fr.tse.poc.dao.RoleRepository;
 import fr.tse.poc.dao.UserRepository;
 import fr.tse.poc.domain.Role;
 import fr.tse.poc.domain.User;
+import fr.tse.poc.exceptions.ResourceNotFoundException;
 import fr.tse.poc.security.jwt.JwtUtils;
 import fr.tse.poc.security.services.UserDetailsImpl;
+import fr.tse.poc.service.RoleService;
 import fr.tse.poc.utils.LoginRequest;
 import fr.tse.poc.utils.MessageResponse;
 import fr.tse.poc.utils.SignupRequest;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,11 +26,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import static fr.tse.poc.utils.Constantes.*;
+import java.security.Principal;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("")
 public class AuthenticationController {
 
     @Autowired
@@ -38,6 +40,9 @@ public class AuthenticationController {
 
     @Autowired
     RoleRepository roleRepo;
+
+    @Autowired
+    RoleService roleService;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -67,7 +72,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+    @PreAuthorize("hasAnyAuthority('Manager')")
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest, Principal principal) {
 
         if (Boolean.TRUE.equals(userRepo.existsByEmail(signUpRequest.getEmail()))) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
@@ -80,32 +86,32 @@ public class AuthenticationController {
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(encoder.encode(signUpRequest.getPassword()));
         user.setJob(signUpRequest.getJob());
+        // Get the authenticated manager's email
+        String managerEmail = principal.getName();
+        User manager = this.userRepo.findByEmail(managerEmail).orElse(null);
+        // the current authenticated manager is the new user's manager
+        user.setManager(manager);
 
         Long role = signUpRequest.getRole();
         Role roleBD;
 
         if (role == null) {
-            throw new RuntimeException(EXCEPTION_ROLE_NOT_FOUND);
+            throw new ResourceNotFoundException("Role not found");
         } else {
-
-            if (role == ADMIN_ROLE) {
-                roleBD = roleRepo.findById(ADMIN_ROLE)
-                        .orElseThrow(() -> new RuntimeException(EXCEPTION_ROLE_NOT_FOUND));
-            } else if (role == MANAGER_ROLE) {
-                roleBD = roleRepo.findById(MANAGER_ROLE)
-                        .orElseThrow(() -> new RuntimeException(EXCEPTION_ROLE_NOT_FOUND));
-            } else if (role == USER_ROLE) {
-                roleBD = roleRepo.findById(USER_ROLE)
-                        .orElseThrow(() -> new RuntimeException(EXCEPTION_ROLE_NOT_FOUND));
-            } else {
-                throw new RuntimeException(EXCEPTION_ROLE_NOT_FOUND);
-            }
+            roleBD = this.roleService.findRole(role);
         }
 
         user.setRole(roleBD);
         userRepo.save(user);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+    }
+
+    @GetMapping("/signout")
+    public ResponseEntity<?> logoutUser() {
+        ResponseCookie cookie = this.jwtUtils.getCleanJwtCookie();
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(new MessageResponse("You've been signed out!"));
     }
 
 }
