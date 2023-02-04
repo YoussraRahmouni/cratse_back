@@ -7,6 +7,8 @@ import fr.tse.poc.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -24,6 +26,10 @@ public class UserService {
 
     public User findUser(String email){
         return userRepo.findByEmail(email).orElse(null);
+    }
+
+    public List<User> getAllUsers(){
+        return this.userRepo.findAll();
     }
 
     public User checkUserExists(Object userIdOrEmail){
@@ -51,6 +57,10 @@ public class UserService {
     public User updateUserManager(User user, User manager){
         user.setManager(manager);
         return this.userRepo.save(user);
+    }
+
+    public List<User> getUsersByManager(User manager){
+        return this.userRepo.findByManager(manager);
     }
 
 }

@@ -1,6 +1,7 @@
 package fr.tse.poc.controller;
 
 import fr.tse.poc.domain.Imputation;
+import fr.tse.poc.domain.ImputationOnlyProject;
 import fr.tse.poc.domain.Project;
 import fr.tse.poc.domain.User;
 import fr.tse.poc.exceptions.NotAuthorizedException;
@@ -15,12 +16,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class ImputationController {
@@ -34,29 +35,36 @@ public class ImputationController {
     @Autowired
     ImputationService imputationService;
 
-    @GetMapping("/users/{userId}/projects/{projectId}/imputations")
+    @GetMapping("users/{userId}/imputations/projects")
+    public ResponseEntity<Set<ImputationOnlyProject>> getProjects(@PathVariable(value = "userId") Long userId,
+                                                                  Principal principal){
+        User user = this.userService.checkUserExists(userId);
+        checkRole(principal, user);
+        Set<ImputationOnlyProject> projects = this.imputationService.findProjectsByUser(user);
+        return new ResponseEntity<>(projects, HttpStatus.OK);
+    }
+
+    @GetMapping("/users/{userId}/imputations")
     public ResponseEntity<List<Imputation>> getAllImputations(@PathVariable(value = "userId") Long userId,
+                                                              Principal principal){
+        User user = this.userService.checkUserExists(userId);
+        checkRole(principal, user);
+
+        List<Imputation> imputations = this.imputationService.findAllImputations(user);
+        return new ResponseEntity<>(imputations, HttpStatus.OK);
+    }
+
+    @GetMapping("/users/{userId}/projects/{projectId}/imputations")
+    public ResponseEntity<List<Imputation>> getProjectImputations(@PathVariable(value = "userId") Long userId,
                                                               @PathVariable(value = "projectId") Long projectId,
                                                               Principal principal){
 
         User user = this.userService.checkUserExists(userId);
         Project project = checkProjectExists(projectId);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        String role = authorities.stream().findFirst().map(GrantedAuthority::getAuthority).orElse("");
-        switch (role){
-            case "User":
-                checkUserId(principal, user);
-                break;
-            case "Manager":
-                checkUserManager(principal, user);
-                break;
-            default:
-                break;
-        }
+        checkRole(principal, user);
 
-        List<Imputation> imputations = this.imputationService.findAllImputations(user, project);
+        List<Imputation> imputations = this.imputationService.findProjectImputations(user, project);
         return new ResponseEntity<>(imputations, HttpStatus.OK);
 
     }
@@ -91,7 +99,7 @@ public class ImputationController {
     public void checkUserId(Principal principal, User user){
         // A user can't create imputations of other users
         if(!user.getEmail().equals(principal.getName())){
-            throw new NotAuthorizedException("You can only access and modify your ressources");
+            throw new NotAuthorizedException("You can only access and modify your resources");
         }
     }
 
@@ -103,6 +111,26 @@ public class ImputationController {
     public void checkUserManager(Principal principal, User user){
         if(user.getManager() == null || !user.getManager().getEmail().equals(principal.getName())){
             throw new NotAuthorizedException("As a manager, you can access only your users' imputations");
+        }
+    }
+
+    public void checkRole(Principal principal, User user){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        String role = authorities.stream().findFirst().map(GrantedAuthority::getAuthority).orElse("");
+        switch (role){
+            case "User":
+                checkUserId(principal, user);
+                break;
+            case "Manager":
+                // if the manager isn't trying to access his imputations
+                // then we must check if he's the manager of the user whose imputations he's trying to access
+                if(!user.getEmail().equals(principal.getName())) {
+                    checkUserManager(principal, user);
+                }
+                break;
+            default:
+                break;
         }
     }
 
