@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.List;
 
 @RestController
-//@RequestMapping(produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
+@RequestMapping(produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
 public class ImputationController {
 
     @Autowired
@@ -69,22 +69,7 @@ public class ImputationController {
 
     }
 
-//    @PostMapping("/users/{userId}/projects/{projectId}/imputations")
-//    public ResponseEntity<Imputation> createImputation(@PathVariable(value = "userId") Long userId,
-//                                                       @PathVariable(value = "projectId") Long projectId,
-//                                                       @Valid @RequestBody Imputation imputation,
-//                                                       Principal principal){
-//        User user = this.userService.checkUserExists(userId);
-//        Project project = checkProjectExists(projectId);
-//        checkUserId(principal, user);
-//        imputation.setUser(user);
-//        imputation.setProject(project);
-//        Imputation newImp = this.imputationService.createImputation(imputation);
-//        return new ResponseEntity<>(newImp, HttpStatus.CREATED);
-//    }
-
-
-    @PutMapping(value = "/users/{userId}/projects/{projectId}/imputations")
+    @PutMapping(value = "/users/{userId}/projects/{projectId}/imputations", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Imputation> createImputation(@PathVariable(value = "userId") Long userId,
                                                        @PathVariable(value = "projectId") Long projectId,
                                                        @Valid @RequestBody Imputation imputation,
