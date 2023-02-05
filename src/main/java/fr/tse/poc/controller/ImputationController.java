@@ -36,11 +36,11 @@ public class ImputationController {
     ImputationService imputationService;
 
     @GetMapping("users/{userId}/imputations/projects")
-    public ResponseEntity<Set<ImputationOnlyProject>> getProjects(@PathVariable(value = "userId") Long userId,
+    public ResponseEntity<List<Project>> getProjects(@PathVariable(value = "userId") Long userId,
                                                                   Principal principal){
         User user = this.userService.checkUserExists(userId);
         checkRole(principal, user);
-        Set<ImputationOnlyProject> projects = this.imputationService.findProjectsByUser(user);
+        List<Project> projects = this.imputationService.findProjectsByUser(user);
         return new ResponseEntity<>(projects, HttpStatus.OK);
     }
 
@@ -82,6 +82,28 @@ public class ImputationController {
         Imputation newImp = this.imputationService.createImputation(imputation);
         return new ResponseEntity<>(newImp, HttpStatus.CREATED);
     }
+
+
+//    @PutMapping("/users/{userId}/projects/{projectId}/imputations")
+//    public ResponseEntity<Imputation> createImputation(@PathVariable(value = "userId") Long userId,
+//                                                       @PathVariable(value = "projectId") Long projectId,
+//                                                       @Valid @RequestBody Imputation imputation,
+//                                                       Principal principal){
+//        User user = this.userService.checkUserExists(userId);
+//        Project project = checkProjectExists(projectId);
+//        checkUserId(principal, user);
+//        Imputation imputationBD = this.imputationService.findImputationByUserAndProjectAndDate(user, project, imputation.getDateImputation());
+//        if(imputationBD == null){
+//            imputationBD = new Imputation();
+//            imputationBD.setUser(user);
+//            imputationBD.setProject(project);
+//            imputationBD.setDateImputation(imputation.getDateImputation());
+//        }
+//        imputationBD.setDailyChargeImputation(imputation.getDailyChargeImputation());
+//        Imputation newImp = this.imputationService.createImputation(imputationBD);
+//        return new ResponseEntity<>(newImp, HttpStatus.CREATED);
+//
+//    }
 
     public Project checkProjectExists(Long projectId){
         Project project = this.projectService.findProject(projectId);

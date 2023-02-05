@@ -7,6 +7,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Getter
@@ -18,8 +19,10 @@ public class Imputation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idImputation;
 
+    @NotNull
     private LocalDate dateImputation;
 
+    @NotNull
     private Double dailyChargeImputation;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

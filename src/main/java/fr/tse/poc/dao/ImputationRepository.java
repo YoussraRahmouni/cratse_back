@@ -7,7 +7,9 @@ import fr.tse.poc.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -15,6 +17,7 @@ public interface ImputationRepository extends JpaRepository<Imputation, Long> {
 
     List<Imputation> findByUserAndProject(User user, Project project);
     List<Imputation> findByUser(User user);
-    Set<ImputationOnlyProject> findDistinctProjectByUser(User user);
+    List<ImputationOnlyProject> findDistinctProjectByUser(User user);
+    Optional<Imputation> findByUserAndProjectAndDateImputation(User user, Project project, LocalDate dateImputation);
 
 }

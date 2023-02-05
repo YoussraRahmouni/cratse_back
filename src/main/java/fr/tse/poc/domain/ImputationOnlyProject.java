@@ -1,5 +1,10 @@
 package fr.tse.poc.domain;
 
-public interface ImputationOnlyProject {
-    Project getProject();
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class ImputationOnlyProject {
+    private Project project;
 }
