@@ -8,12 +8,14 @@ import fr.tse.poc.exceptions.ResourceNotFoundException;
 import fr.tse.poc.security.jwt.JwtUtils;
 import fr.tse.poc.security.services.UserDetailsImpl;
 import fr.tse.poc.service.RoleService;
+import fr.tse.poc.service.UserService;
 import fr.tse.poc.utils.LoginRequest;
 import fr.tse.poc.utils.MessageResponse;
 import fr.tse.poc.utils.SignupRequest;
 import fr.tse.poc.utils.UserInfoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -43,6 +45,9 @@ public class AuthenticationController {
 
     @Autowired
     RoleService roleService;
+
+    @Autowired
+    UserService userService;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -104,9 +109,9 @@ public class AuthenticationController {
         }
 
         user.setRole(roleBD);
-        userRepo.save(user);
+        User newUser = this.userService.createUser(user);
 
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 
     @GetMapping("/signout")

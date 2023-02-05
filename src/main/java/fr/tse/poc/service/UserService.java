@@ -63,4 +63,8 @@ public class UserService {
         return this.userRepo.findByManager(manager);
     }
 
+    public User createUser(User user){
+        return this.userRepo.save(user);
+    }
+
 }
