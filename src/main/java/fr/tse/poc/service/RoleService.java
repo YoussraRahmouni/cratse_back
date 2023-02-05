@@ -22,4 +22,8 @@ public class RoleService {
     public Role findRole(long idRole){
         return roleRepo.findById(idRole).orElseThrow(() -> new ResourceNotFoundException("Role not found"));
     }
+
+    public Role findRoleByLabel(String roleLabel){
+        return this.roleRepo.findByLabelRole(roleLabel).orElse(null);
+    }
 }

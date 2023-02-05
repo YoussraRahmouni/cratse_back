@@ -1,5 +1,6 @@
 package fr.tse.poc.utils;
 
+import fr.tse.poc.domain.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -11,6 +12,6 @@ public class UserInfoResponse {
     private String firstName;
     private String lastName;
     private String email;
-    private String role;
+    private Role role;
 
 }

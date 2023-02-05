@@ -63,12 +63,14 @@ public class AuthenticationController {
 
         String role = userDetails.getAuthorities().iterator().next().getAuthority();
 
+        Role roleBD = this.roleService.findRoleByLabel(role);
+
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .body(new UserInfoResponse(userDetails.getIdUser(),
                         userDetails.getFirstName(),
                         userDetails.getLastName(),
                         userDetails.getEmail(),
-                        role));
+                        roleBD));
     }
 
     @PostMapping("/signup")
