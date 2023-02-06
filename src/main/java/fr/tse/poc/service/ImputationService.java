@@ -42,4 +42,11 @@ public class ImputationService {
         return this.imputationRepo.findByUserAndProjectAndDateImputation(user, project, dateImputation).orElse(null);
     }
 
+    public List<Imputation> findImputationByUserInMonthAndYear(User user, Integer month, Integer year){
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+
+        return this.imputationRepo.findByUserAndDateImputationBetween(user, startDate, endDate);
+    }
+
 }

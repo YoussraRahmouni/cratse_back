@@ -39,7 +39,7 @@ public class ImputationController {
     public ResponseEntity<List<Project>> getProjects(@PathVariable(value = "userId") Long userId,
                                                                   Principal principal){
         User user = this.userService.checkUserExists(userId);
-        checkRole(principal, user);
+        this.userService.checkRole(principal, user);
         List<Project> projects = this.imputationService.findProjectsByUser(user);
         return new ResponseEntity<>(projects, HttpStatus.OK);
     }
@@ -48,7 +48,7 @@ public class ImputationController {
     public ResponseEntity<List<Imputation>> getAllImputations(@PathVariable(value = "userId") Long userId,
                                                               Principal principal){
         User user = this.userService.checkUserExists(userId);
-        checkRole(principal, user);
+        this.userService.checkRole(principal, user);
 
         List<Imputation> imputations = this.imputationService.findAllImputations(user);
         return new ResponseEntity<>(imputations, HttpStatus.OK);
@@ -60,9 +60,9 @@ public class ImputationController {
                                                               Principal principal){
 
         User user = this.userService.checkUserExists(userId);
-        Project project = checkProjectExists(projectId);
+        Project project = this.projectService.checkProjectExists(projectId);
 
-        checkRole(principal, user);
+        this.userService.checkRole(principal, user);
 
         List<Imputation> imputations = this.imputationService.findProjectImputations(user, project);
         return new ResponseEntity<>(imputations, HttpStatus.OK);
@@ -75,8 +75,8 @@ public class ImputationController {
                                                        @Valid @RequestBody Imputation imputation,
                                                        Principal principal){
         User user = this.userService.checkUserExists(userId);
-        Project project = checkProjectExists(projectId);
-        checkUserId(principal, user);
+        Project project = this.projectService.checkProjectExists(projectId);
+        this.userService.checkUserId(principal, user);
         Imputation imputationBD = this.imputationService.findImputationByUserAndProjectAndDate(user, project, imputation.getDateImputation());
         if(imputationBD == null){
             imputationBD = new Imputation();
@@ -88,57 +88,6 @@ public class ImputationController {
         Imputation newImp = this.imputationService.createImputation(imputationBD);
         return new ResponseEntity<>(newImp, HttpStatus.CREATED);
 
-    }
-
-    public Project checkProjectExists(Long projectId){
-        Project project = this.projectService.findProject(projectId);
-        if (project == null) {
-            throw new ResourceNotFoundException("Project not found with id = " + projectId);
-        }
-        return project;
-    }
-
-    /**
-     * Check the user authenticated to see if it's the same as the user in the URL
-     * @param principal the current authenticated user
-     * @param user the user whose resources we want to modify
-     */
-    public void checkUserId(Principal principal, User user){
-        // A user can't create imputations of other users
-        if(!user.getEmail().equals(principal.getName())){
-            throw new NotAuthorizedException("You can only access and modify your resources");
-        }
-    }
-
-    /**
-     * Check if current authenticated user is manager of user whose resources we want to access
-     * @param principal the current authenticated manager
-     * @param user the user whose resources we want to access
-     */
-    public void checkUserManager(Principal principal, User user){
-        if(user.getManager() == null || !user.getManager().getEmail().equals(principal.getName())){
-            throw new NotAuthorizedException("As a manager, you can access only your users' imputations");
-        }
-    }
-
-    public void checkRole(Principal principal, User user){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        String role = authorities.stream().findFirst().map(GrantedAuthority::getAuthority).orElse("");
-        switch (role){
-            case "User":
-                checkUserId(principal, user);
-                break;
-            case "Manager":
-                // if the manager isn't trying to access his imputations
-                // then we must check if he's the manager of the user whose imputations he's trying to access
-                if(!user.getEmail().equals(principal.getName())) {
-                    checkUserManager(principal, user);
-                }
-                break;
-            default:
-                break;
-        }
     }
 
 }

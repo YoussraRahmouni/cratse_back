@@ -19,5 +19,6 @@ public interface ImputationRepository extends JpaRepository<Imputation, Long> {
     List<Imputation> findByUser(User user);
     List<ImputationOnlyProject> findDistinctProjectByUser(User user);
     Optional<Imputation> findByUserAndProjectAndDateImputation(User user, Project project, LocalDate dateImputation);
+    List<Imputation> findByUserAndDateImputationBetween(User user, LocalDate startDate, LocalDate endDate);
 
 }

@@ -64,14 +64,18 @@
 		<dependency>
 			<groupId>org.freemarker</groupId>
 			<artifactId>freemarker</artifactId>
-			<version>2.3.29</version>
+			<version>2.3.30</version>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.xhtmlrenderer</groupId>-->
-<!--			<artifactId>flying-saucer-core</artifactId>-->
-<!--			<version>9.1.23</version>-->
-<!--		</dependency>-->
-
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>kernel</artifactId>
+			<version>7.1.12</version>
+		</dependency>
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>html2pdf</artifactId>
+			<version>3.0.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

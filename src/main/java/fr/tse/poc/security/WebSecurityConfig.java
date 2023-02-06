@@ -92,4 +92,11 @@ public class WebSecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
+
+    @Bean
+    public freemarker.template.Configuration freemarkerConfig() {
+        freemarker.template.Configuration config = freemarker.template.Configuration.getDefaultConfiguration();
+        config.setDefaultEncoding("UTF-8");
+        return config;
+    }
 }

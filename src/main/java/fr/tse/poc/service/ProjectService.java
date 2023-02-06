@@ -2,6 +2,7 @@ package fr.tse.poc.service;
 
 import fr.tse.poc.dao.ProjectRepository;
 import fr.tse.poc.domain.Project;
+import fr.tse.poc.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,5 +33,13 @@ public class ProjectService {
 
     public Project createProject(Project project){
         return this.projectRepo.save(project);
+    }
+
+    public Project checkProjectExists(Long projectId){
+        Project project = this.findProject(projectId);
+        if (project == null) {
+            throw new ResourceNotFoundException("Project not found with id = " + projectId);
+        }
+        return project;
     }
 }
