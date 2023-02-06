@@ -1,5 +1,6 @@
 package fr.tse.poc.dao;
 
+import fr.tse.poc.domain.Role;
 import fr.tse.poc.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -15,5 +16,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Boolean existsByEmail(String email);
 
     List<User> findByManager(User user);
+
+    List<User> findByRole(Role role);
 
 }

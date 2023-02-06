@@ -58,4 +58,12 @@ public class UserController {
         List<User> users = this.userService.getAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasAnyAuthority('Admin')")
+    @GetMapping("/managers")
+    public ResponseEntity<List<User>> getManagers(){
+        Role managerRole = this.roleService.findRoleByLabel("Manager");
+        List<User> managers = this.userService.findByRole(managerRole);
+        return new ResponseEntity<>(managers, HttpStatus.OK);
+    }
 }
