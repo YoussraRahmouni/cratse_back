@@ -1,10 +1,13 @@
 package fr.tse.poc.utils;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiResponse;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
+@ApiModel(description = "Error Response Model")
 public class ErrorResponse {
 
     private String errorCode;

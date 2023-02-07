@@ -9,10 +9,10 @@ import fr.tse.poc.security.jwt.JwtUtils;
 import fr.tse.poc.security.services.UserDetailsImpl;
 import fr.tse.poc.service.RoleService;
 import fr.tse.poc.service.UserService;
-import fr.tse.poc.utils.LoginRequest;
-import fr.tse.poc.utils.MessageResponse;
-import fr.tse.poc.utils.SignupRequest;
-import fr.tse.poc.utils.UserInfoResponse;
+import fr.tse.poc.utils.*;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -30,6 +30,7 @@ import javax.validation.Valid;
 
 import java.security.Principal;
 
+@ApiOperation(value = "/", tags = "User Authentication Controller")
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 public class AuthenticationController {
@@ -55,8 +56,14 @@ public class AuthenticationController {
     @Autowired
     PasswordEncoder encoder;
 
+    @ApiOperation(value = "Sign in a user with an email and a password", response = ResponseEntity.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "SUCCESS", response = ResponseEntity.class),
+            @ApiResponse(code = 400, message = "BAD REQUEST", response = ErrorResponse.class),
+            @ApiResponse(code = 401, message = "UNAUTHORIZED", response = ErrorResponse.class)
+    })
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginBody){
+    public ResponseEntity<UserInfoResponse> login(@Valid @RequestBody LoginRequest loginBody){
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginBody.getEmail(), loginBody.getPassword()));
 
@@ -78,6 +85,7 @@ public class AuthenticationController {
                         roleBD));
     }
 
+    @ApiOperation(value = "Sign up a user with their infos", response = ResponseEntity.class)
     @PostMapping("/signup")
     @PreAuthorize("hasAnyAuthority('Manager')")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest, Principal principal) {
@@ -114,6 +122,7 @@ public class AuthenticationController {
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 
+    @ApiOperation(value = "Log a user out", response = ResponseEntity.class)
     @GetMapping("/signout")
     public ResponseEntity<?> logoutUser() {
         ResponseCookie cookie = this.jwtUtils.getCleanJwtCookie();

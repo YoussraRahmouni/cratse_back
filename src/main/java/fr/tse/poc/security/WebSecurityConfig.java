@@ -12,8 +12,11 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -23,6 +26,17 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
+
+//    @Bean
+//    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
+//        UserDetails user = User.withUsername("spring")
+//                .password(passwordEncoder.encode("poc"))
+//                .roles("Admin")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(user);
+//    }
+
 
     @Autowired
     UserDetailsServiceImpl userDetailsService;
@@ -64,10 +78,9 @@ public class WebSecurityConfig {
             .authenticationEntryPoint(unauthorizedHandler)
             .and()
             .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .authorizeRequests()
-            .antMatchers("/login", "/signout").permitAll()
+            .antMatchers("/login", "/signout", "/api-docs", "/api-docs.yaml", "/swagger-ui.html" , "/swagger-ui/index.html", "/swagger-api", "/api/v2/api-docs", "/v2/api-docs", "/swagger-ui").permitAll()
             .anyRequest().authenticated();
 
         http.authenticationProvider(authenticationProvider());

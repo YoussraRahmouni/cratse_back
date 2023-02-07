@@ -3,8 +3,6 @@ package fr.tse.poc.controller;
 import fr.tse.poc.domain.Imputation;
 import fr.tse.poc.domain.Project;
 import fr.tse.poc.domain.User;
-import fr.tse.poc.exceptions.NotAuthorizedException;
-import fr.tse.poc.exceptions.ResourceNotFoundException;
 import fr.tse.poc.service.ImputationService;
 import fr.tse.poc.service.ProjectService;
 import fr.tse.poc.service.UserService;
@@ -12,14 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.Collection;
 import java.util.List;
 
 @RestController
